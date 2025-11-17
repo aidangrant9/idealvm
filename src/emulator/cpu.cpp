@@ -1,5 +1,5 @@
-#include "cpu.hpp"
-#include "defs.hpp"
+#include "src/emulator/cpu.hpp"
+#include "src/common/defs.hpp"
 #include <cstdint>
 #include <algorithm>
 #include <stdexcept>

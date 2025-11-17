@@ -1,5 +1,5 @@
 #include <iostream>
-#include "cpu.hpp"
+#include "src/emulator/cpu.hpp"
 
 int main(){
 	std::cout << "Hello, World!\n";
