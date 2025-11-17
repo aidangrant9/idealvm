@@ -122,6 +122,7 @@ void CPU::executePriviliged(const Inst &inst){
     st.protectedReg[PSP] = st.registers[SP];
     st.registers[SP] = st.protectedReg[USP];
 
+    st.protectedReg[EFLAGS] = eflags;
     st.protectedReg[EFLAGS] |= EF::PROTECTED_ENABLE | EF::INTERRUPT_ENABLE;
   }
 }

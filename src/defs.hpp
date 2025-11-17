@@ -1,6 +1,5 @@
 #pragma once
 
-#include "src/defs.hpp"
 #include <cstdint>
 
 // Execution flag masks
