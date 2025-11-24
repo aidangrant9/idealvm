@@ -1,4 +1,4 @@
-#include "src/emulator/cpu.hpp"
+#include "cpu.hpp"
 #include "src/common/defs.hpp"
 #include <cstdint>
 #include <algorithm>
@@ -124,6 +124,8 @@ void CPU::executePriviliged(const Inst &inst){
 
     st.protectedReg[EFLAGS] = eflags;
     st.protectedReg[EFLAGS] |= EF::PROTECTED_ENABLE | EF::INTERRUPT_ENABLE;
+
+    handlingInterrupt = false;
   }
 }
 
