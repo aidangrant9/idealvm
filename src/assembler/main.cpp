@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "tokenizer.hpp"
 
 #include <cstdlib>
 #include <ios>
@@ -114,13 +115,13 @@ int main(int argc, char *argv[]){
 
   // Tokenize input at this point we should not have any file handles
   // open as this function can terminate
-  std::vector<std::vector<Token>> tokens = tokenize(buffer);
-
+  std::vector<tokenizedLine> tokens = tokenize(buffer);
+  parse(tokens);
 
   #ifdef TOKEN_DEBUG
   for(auto &vt : tokens){
     std::cout << "\n LINE \n\n";
-    for(auto &t : vt){
+    for(auto &t : vt.toks){
       std::cout << t.print() << "\n";
     }
   }

@@ -4,6 +4,22 @@
 #include <cstdint>
 #include <vector>
 
+// To be thrown as an exception
+struct Interrupt {
+  IntCode code;
+  uint64_t info{0};
+  Interrupt(const IntCode code, const uint64_t info) : code{code}, info{info}
+  {};
+};
+
+// Decoded binary register operation instruction
+struct Inst {
+  uint8_t opcode;
+  uint8_t r0; // Only 4 bits of the registers are used
+  uint8_t r1;
+  int16_t offset;
+};
+
 struct CPU {
   struct State {
     uint64_t registers[16]{};
@@ -17,7 +33,6 @@ struct CPU {
 
   uint64_t nip{};     // New instruction pointer
   bool nipSet{false}; // Should nip be used?
-  bool intSet{false}; // Interrupt requested
   bool handlingInterrupt{false}; // Is an interrupt being handled?
 
   CPU(State s, const size_t memSize);
@@ -51,4 +66,8 @@ struct CPU {
   void mStore(const uint32_t physicalAddress, uint64_t data,
               const uint8_t nBytes);
 };
+
+
+
+
 

@@ -25,15 +25,6 @@ namespace PE {
   inline constexpr uint32_t ACCESSED = 0x20;
 }
 
-
-// Decoded binary register operation instruction
-struct Inst {
-  uint8_t opcode;
-  uint8_t r0; // Only 4 bits of the registers are used
-  uint8_t r1;
-  int16_t offset;
-};
-
 // Register names (4bit max)
 enum Reg : uint8_t {
   // GP Registers
@@ -129,13 +120,4 @@ enum IntCode : uint8_t {
 
   SOFTWARE_INTERUPT_START = 0xA0,
   SOFTWARE_INTERUPT_END = 0xFF
-};
-
-
-// To be thrown as an exception
-struct Interrupt {
-  IntCode code;
-  uint64_t info{0};
-  Interrupt(const IntCode code, const uint64_t info) : code{code}, info{info}
-  {};
 };

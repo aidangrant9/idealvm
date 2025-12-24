@@ -18,7 +18,7 @@ void CPU::progressClock(void){
     handleInterrupt(i);
   }
   catch(std::out_of_range &e){
-
+    //TODO:
   }
 
   if(nipSet){
