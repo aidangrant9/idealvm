@@ -7,15 +7,15 @@
 using enum Token::tokenType;
 using Error = Parser::Error; 
 
-std::vector<Statement> parse(std::vector<tokenizedLine> &input){
-  std::vector<Statement> ret{};
+std::vector<std::pair<Statement,tokenizedLine>> parse(std::vector<tokenizedLine> &input){
+  std::vector<std::pair<Statement,tokenizedLine>> ret{};
 
   for(auto &vt : input){
     if(vt.toks.empty())
       continue;
 
     Statement s = parseLine(vt);
-    ret.push_back(s);
+    ret.push_back(std::make_pair(s,vt));
   }
 
   return ret;
@@ -24,11 +24,6 @@ std::vector<Statement> parse(std::vector<tokenizedLine> &input){
 Statement parseLine(tokenizedLine &line){
   Parser p(line.toks, 0);
   std::optional<Statement> ret{};
-
-  // Check first ident, inst ->     parse inst
-  //                    data_imp -> parse data imp
-  //                    arb ->      parse label
-  // else: expect identifier failure
 
   Token firstTok = p.peek();
 
@@ -311,7 +306,7 @@ std::optional<Offset> parseOffset(Parser &p){
       return std::nullopt;
     }
     
-    auto num = parse16BitInt(p, sign->type);
+    auto num = parse16BitInt(p, sign2->type);
 
     if(!num)
       return std::nullopt;
@@ -404,6 +399,12 @@ std::optional<Statement> parseDataImperative(Parser &p){
     ret.nBytes = 8;
   }
 
+  // If the data imperative is supposed to be an address, it must be DW
+  if(ret.label && ret.nBytes != 4){
+    p.error.emplace("Data imperative should match address size, use \"DW\"", ident.value());
+    return std::nullopt;
+  }
+
   if(badSize){
     p.error.emplace("Integer literal " + std::string(op0->contents) + " too large for desired data type",
                     op0.value());
@@ -424,6 +425,8 @@ std::optional<Statement> parseLabel(Parser &p){
   }
 
   std::string i = std::string(ident->contents);
+
+  ret.name = ident->contents;
 
   if(instNames.contains(i) || regNames.contains(i) || protectedRegNames.contains(i)){
     p.error.emplace("Identifier \"" + i + "\" is a reserved keyword", ident.value());
@@ -462,7 +465,7 @@ std::optional<Statement> parseLabel(Parser &p){
 }
 
 bool isEnd(Parser &p){
-  if(p.peek().type != END)
-    return false;
-  return true;
+  if(p.peek().type == END)
+    return true;
+  return false;
 }

@@ -1,3 +1,4 @@
+#include "codegen.hpp"
 #include "parser.hpp"
 #include "tokenizer.hpp"
 
@@ -11,7 +12,6 @@
 #include <optional>
 #include <fstream>
 
-#define TOKEN_DEBUG
 
 int main(int argc, char *argv[]){
   // Could change to use a hash table with more arguments
@@ -22,11 +22,14 @@ int main(int argc, char *argv[]){
                             "Use --help flag for further information\n";
   const std::string help = "Flags:\n"
                            "-o [filepath]: Set output filepath\n"
-                           "-s [imagesize]: Set the output image size in bytes.";
+                           "-s [imagesize]: Set the output image size in bytes.\n"
+                           "--pack: Enable code packing (code segments may be reordered)";
 
   std::vector<std::string> positionalArguments{};
   std::filesystem::path outputPath{};
   std::optional<std::size_t> imageSize{};
+
+  AssemblyOptions assemblyOptions{};
 
   for(int i{1}; i < argc; i++){
     const std::string arg = argv[i];
@@ -63,6 +66,9 @@ int main(int argc, char *argv[]){
         std::cerr << usage << "-s: Invalid image size, value must be a decimal integer between 1 and 8MiB\n";
         return EXIT_FAILURE;
       }
+    }
+    else if(arg == "--pack"){
+      assemblyOptions.packingEnabled = true;
     }
     else if(arg == "--help"){
       std::cout << help;
@@ -116,7 +122,8 @@ int main(int argc, char *argv[]){
   // Tokenize input at this point we should not have any file handles
   // open as this function can terminate
   std::vector<tokenizedLine> tokens = tokenize(buffer);
-  parse(tokens);
+  auto statements = parse(tokens);
+  auto bitStream = generateCode(statements, assemblyOptions);
 
   #ifdef TOKEN_DEBUG
   for(auto &vt : tokens){
@@ -126,6 +133,21 @@ int main(int argc, char *argv[]){
     }
   }
   #endif
+
+  if(outputPath.empty()){
+    outputPath = inputPath.stem().string() + ".bin";
+  }
+
+  try{
+    std::ofstream outputFile(outputPath, std::ios::binary | std::ios::out);
+    outputFile.write(reinterpret_cast<char *>(bitStream.data()), bitStream.size());
+  }
+  catch(...){
+    std::cerr << "Error writing to file " + outputPath.filename().string() << "\n";
+    return EXIT_FAILURE;
+  }
+
+  std::cout << "Done! Output to " << outputPath.filename().string() << "\n";
   
   return EXIT_SUCCESS;
 }

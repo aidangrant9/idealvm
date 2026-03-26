@@ -362,7 +362,6 @@ uint32_t CPU::resolveAddress(const uint32_t address, const bool write, const boo
   const uint16_t rootIndex = (address & 0xFFC00000) >> 22;
   const uint16_t pageIndex = (address & 0x3FF000) >> 12;
   const uint16_t offset = address & 0xFFF;
-  
 
   auto getPageMap = [&] (const uint32_t entry) -> uint32_t {
     uint64_t errorType{};

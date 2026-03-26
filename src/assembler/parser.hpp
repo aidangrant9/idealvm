@@ -173,7 +173,7 @@ static std::unordered_map<std::string, uint8_t> protectedRegNames {
   {"RPT", ProtectedReg::RPT},
 };
 
-std::vector<Statement> parse(std::vector<tokenizedLine> &input);
+std::vector<std::pair<Statement,tokenizedLine>> parse(std::vector<tokenizedLine> &input);
 Statement parseLine(tokenizedLine &line);
 bool isLabelForm(std::vector<Token> &line);
 bool isDataImperativeForm(std::vector<Token> &line);
